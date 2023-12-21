@@ -19,17 +19,19 @@
 
           const ws = new WebSocket('ws://46.4.32.181:8080')
           ws.onopen = (msg) => {
-              console.log(msg)
+              //console.log(msg)
               ws.send('simple')
           }
 
           ws.onmessage = (event) => {
+            console.log(event.data)
             const data = JSON.parse(event.data);
+            console.log(data.lng, data.lat)
             coordinates = {
               lng: data.lng,
               lat: data.lat
             }
-            console.log(coordinates)
+            //console.log(coordinates)
             updateMap(coordinates)
           }
 
