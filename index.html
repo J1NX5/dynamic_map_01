@@ -3,22 +3,45 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="leaflet.css"/>
     <title>Dynamicmap-Test</title>
   </head>
   <body>
+    <div id="map" style="height: 400px;"></div>
+    <script src="leaflet.js"></script>
     <script>
-        (() => {
-            const ws = new WebSocket('ws://46.4.32.181:8080')
-            ws.onopen = (msg) => {
-                console.log(msg)
-                ws.send('simple')
-            }
 
-            ws.onmessage = (message) => {
-                console.log(`message received ${message}`)
-            }
+          var map = L.map('map').setView([51.505, -0.09], 13);
 
-        })()
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+          }).addTo(map);
+
+          const ws = new WebSocket('ws://46.4.32.181:8080')
+          ws.onopen = (msg) => {
+              console.log(msg)
+              ws.send('simple')
+          }
+
+          ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            coordinates = {
+              lng: data.lng,
+              lat: data.lat
+            }
+            console.log(coordinates)
+            updateMap(coordinates)
+          }
+
+        function updateMap(coordinates) {
+         var lat = coordinates.lat;
+         var lng = coordinates.lng;
+
+         // Marker hinzufügen oder Karte zentrieren
+         var marker = L.marker([lat, lng]).addTo(map);
+         map.panTo([lat, lng]);
+        }
+
     </script>
   </body>
 </html>
