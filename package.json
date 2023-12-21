@@ -1,11 +1,11 @@
 {
   "dependencies": {
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "websocket": "^1.0.34"
   },
   "name": "map_test_01",
   "version": "1.0.0",
   "main": "leaflet.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "http-server ."
