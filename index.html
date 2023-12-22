@@ -7,7 +7,7 @@
     <title>Dynamicmap-Test</title>
   </head>
   <body>
-    <div id="map" style="height: 400px;"></div>
+    <div id="map" style="height: 800px;"></div>
     <script src="leaflet.js"></script>
     <script>
 
@@ -24,7 +24,10 @@
           //     name: 'ship2'
           //   }
 
-          var map = L.map('map').setView([51.505, -0.09], 13);
+          var map = L.map('map' , {
+            center: [62.19789333333333, 5.420638333333334],
+            zoom: 8
+          })
 
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
@@ -40,13 +43,13 @@
             const data = JSON.parse(event.data);
             switch(data.type) {
               case 'static':{
-                const ship = shipMap.get(data.mmsi)
-                if(ship){
-                  ship.name = data.name
-                  ship?.marker.bindPopup(ship.name)
-                } else {
-                  shipMap.set(data.mmsi, data)
-                }
+                // const ship = shipMap.get(data.mmsi)
+                // if(ship){
+                //   ship.name = data.name
+                //   ship?.marker.bindPopup(ship.name)
+                // } else {
+                //   shipMap.set(data.mmsi, data)
+                // }
                 break
               }
               case 'position':{
@@ -62,10 +65,10 @@
                   console.log('ship not found')
                 }
                 break}
-                default:
-                if(Array.isArray(data)){
-                  for(const value of data){
-                    const ship = value[1]
+                case 'init':
+                  // console.log({data})
+                if(Array.isArray(data.vessels)){
+                  for(const ship of data.vessels){
                     if(ship.lat != undefined && ship.long != undefined) {
                       ship.marker = L.marker([ship.lat, ship.long]).addTo(map)
                       ship.marker.bindPopup(ship.name)
