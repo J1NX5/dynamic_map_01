@@ -11,6 +11,19 @@
     <script src="leaflet.js"></script>
     <script>
 
+          const shipMap = new Map()
+          // {
+          //   1: {
+          //     lat: 51.505,
+          //     lng: -0.09
+          //     name: 'ship1'
+          //   },
+          //   2: {
+          //     lat: 51.505,
+          //     lng: -0.09
+          //     name: 'ship2'
+          //   }
+
           var map = L.map('map').setView([51.505, -0.09], 13);
 
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -24,26 +37,44 @@
           }
 
           ws.onmessage = (event) => {
-            console.log(event.data)
             const data = JSON.parse(event.data);
-            console.log(data.lng, data.lat)
-            coordinates = {
-              lng: data.lng,
-              lat: data.lat
+            switch(data.type) {
+              case 'static':{
+                const ship = shipMap.get(data.mmsi)
+                if(ship){
+                  ship.name = data.name
+                  ship?.marker.bindPopup(ship.name)
+                } else {
+                  shipMap.set(data.mmsi, data)
+                }
+                break
+              }
+              case 'position':{
+                const ship = shipMap.get(data.mmsi)
+                if(ship && (data.lat != ship.lat || data.long != ship.long)){
+                  ship.lat = data.lat
+                  ship.long = data.long
+                  if(ship.marker){
+                    ship.marker.setLatLng([ship.lat, ship.long])
+                    console.log(`ship ${ship.name} moved to ${ship.lat}, ${ship.long}`)
+                  }
+                } else {
+                  console.log('ship not found')
+                }
+                break}
+                default:
+                if(Array.isArray(data)){
+                  for(const value of data){
+                    const ship = value[1]
+                    if(ship.lat != undefined && ship.long != undefined) {
+                      ship.marker = L.marker([ship.lat, ship.long]).addTo(map)
+                      ship.marker.bindPopup(ship.name)
+                    }
+                    shipMap.set(ship.mmsi, ship)
+                  }
+                }
             }
-            //console.log(coordinates)
-            updateMap(coordinates)
           }
-
-        function updateMap(coordinates) {
-         var lat = coordinates.lat;
-         var lng = coordinates.lng;
-
-         // Marker hinzufügen oder Karte zentrieren
-         var marker = L.marker([lat, lng]).addTo(map);
-         map.panTo([lat, lng]);
-        }
-
     </script>
   </body>
 </html>
